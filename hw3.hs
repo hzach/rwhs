@@ -36,27 +36,36 @@ length' (_:xs) = 1 + length' xs
 {- 3.3 -}
 mean :: (Fractional a) => [a] -> a
 mean xs = (1/n) * sum' xs
-          where
-            n = fromIntegral $ length xs
-            sum' (y:ys) = y + (sum' ys)
-            sum' []     = 0
+  where
+    n = fromIntegral $ length xs
+    sum' (y:ys) = y + (sum' ys)
+    sum' []     = 0
 
 
 {- 3.4 -}
-palindrome :: [a] -> [a]
+palindrome :: Ord a => [a] -> [a]
 palindrome xs = xs ++ reverse' xs
-                where
-                  reverse' []     = []
-                  reverse' (x:xs) = (reverse' xs) ++ [x]
-
+  where
+    reverse' []     = []
+    reverse' (x:xs) = (reverse' xs) ++ [x]
 
 {- 3.5 -}
+isPalindrome :: Ord a => [a] -> Bool
+isPalindrome []     = True
+isPalindrome (x:[]) = False
+isPalindrome (x:xs) =
+  let end    = last xs
+      len    = length xs
+      middle = drop len xs
+  in x == end && isPalindrome middle
+
+{- 3.6 -}
 intersperse :: a -> [[a]] -> [a]
 intersperse _ []      = []
 intersperse c (x:xs)  = x ++ c:(intersperse c xs)
 
 
-{- 3.6 -}
+{- 3.7 -}
 
 -- sorts a list of lists by the length of each sublist
 sortByLength :: [[a]] -> [[a]]
