@@ -23,7 +23,7 @@ fromList Nil           = []
 
 
 {- 3.b: Single parameter Tree type with Maybe value -}
-data Maybe a = Just a | Nothing
+data Maybe a = Just a | Empty
 data  Tree a = Node (Tree a) (Tree a) | Maybe a
 
 
@@ -49,6 +49,7 @@ palindrome xs = xs ++ reverse' xs
     reverse' []     = []
     reverse' (x:xs) = (reverse' xs) ++ [x]
 
+
 {- 3.5 -}
 isPalindrome :: Ord a => [a] -> Bool
 isPalindrome []     = True
@@ -58,6 +59,7 @@ isPalindrome (x:xs) =
       len    = length xs
       middle = drop len xs
   in x == end && isPalindrome middle
+
 
 {- 3.6 -}
 intersperse :: a -> [[a]] -> [a]
@@ -75,3 +77,8 @@ sortByLength x = sortBy order x
             lenA = length a
             lenB = length b
           in lenA `compare` lenB
+
+{- 3.8 -}
+height :: Tree a -> Int
+height (Maybe _ )           = 0
+height (Node left right)  = 1 + max (height left) (height right)
