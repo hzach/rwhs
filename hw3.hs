@@ -1,6 +1,8 @@
 
 {- Below are the excerises from Real Worlf Haskell Chapter 3-}
 
+import Data.List (sortBy)
+
 {- 3.a: Recursive list type -}
 
 -- Custom List type
@@ -39,6 +41,7 @@ mean xs = (1/n) * sum' xs
             sum' (y:ys) = y + (sum' ys)
             sum' []     = 0
 
+
 {- 3.4 -}
 palindrome :: [a] -> [a]
 palindrome xs = xs ++ reverse' xs
@@ -46,7 +49,20 @@ palindrome xs = xs ++ reverse' xs
                   reverse' []     = []
                   reverse' (x:xs) = (reverse' xs) ++ [x]
 
+
 {- 3.5 -}
 intersperse :: a -> [[a]] -> [a]
 intersperse _ []      = []
 intersperse c (x:xs)  = x ++ c:(intersperse c xs)
+
+
+{- 3.6 -}
+
+-- sorts a list of lists by the length of each sublist
+sortByLength :: [[a]] -> [[a]]
+sortByLength x = sortBy order x
+  where order a b =
+          let
+            lenA = length a
+            lenB = length b
+          in lenA `compare` lenB
