@@ -78,7 +78,34 @@ sortByLength x = sortBy order x
             lenB = length b
           in lenA `compare` lenB
 
+
 {- 3.8 -}
 height :: Tree a -> Int
-height (Maybe _ )           = 0
+height (Maybe _ )         = 0
 height (Node left right)  = 1 + max (height left) (height right)
+
+
+{- 3.9 -}
+data Direction = LeftTurn | RightTurn | Straight deriving Show
+
+
+{- 3.10 -}
+data Point = Point Double Double deriving Show
+
+
+-- Computes the driection of the turn when traversing from point a to b to c in R^2. In other words,
+-- this function returns the sign of the angle between the line segments ab and bc
+computeTurn :: Point -> Point -> Point -> Direction
+computeTurn (Point a1 a2) (Point b1 b2) (Point c1 c2)
+             | z_comp v u > 0  = LeftTurn
+             | z_comp v u == 0 = Straight
+             | z_comp v u < 0  = RightTurn
+            where
+              z_comp (Point x1 y1) (Point x2 y2) = x1*y2 - x2*y1 -- Computes the z component of the cross product between two vectors
+              v = Point (b1 - a1) (b2 - a2)
+              u = Point (c1 - b1) (c2 - b2)
+
+
+computeTurns :: [Point] -> [Direction]
+computeTurns (x:y:z:zs) = computeTurn x y z : computeTurns y:z:zs
+computeTurns _ = []
