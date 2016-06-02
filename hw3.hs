@@ -92,20 +92,65 @@ data Direction = LeftTurn | RightTurn | Straight deriving Show
 {- 3.10 -}
 data Point = Point Double Double deriving Show
 
+cross :: Point -> Point -> Double
+cross (Point x1 y1) (Point x2 y2) = x1*y2 - x2*y1
+
 
 -- Computes the driection of the turn when traversing from point a to b to c in R^2. In other words,
 -- this function returns the sign of the angle between the line segments ab and bc
 computeTurn :: Point -> Point -> Point -> Direction
 computeTurn (Point a1 a2) (Point b1 b2) (Point c1 c2)
-             | z_comp v u > 0  = LeftTurn
-             | z_comp v u == 0 = Straight
-             | z_comp v u < 0  = RightTurn
-            where
-              z_comp (Point x1 y1) (Point x2 y2) = x1*y2 - x2*y1 -- Computes the z component of the cross product between two vectors
+             | v `cross` u > 0  = LeftTurn
+             | v `cross` u == 0 = Straight
+             | v `cross` u < 0  = RightTurn
+            where  -- Computes the z component of the cross product between two vectors
               v = Point (b1 - a1) (b2 - a2)
               u = Point (c1 - b1) (c2 - b2)
 
 
-computeTurns :: [Point] -> [Direction]
-computeTurns (x:y:z:zs) = computeTurn x y z : computeTurns y:z:zs
-computeTurns _ = []
+-- Sorts a list of points according to their distance from the origin in R^2
+cartesianSort :: [Point] -> [Point]
+cartesianSort ps = sortBy y (sortBy x ps)
+  where
+    y (Point _ y1) (Point _ y2) = y1 `compare` y2
+    x (Point x1 _) (Point x2 _) = x1 `compare` x2
+
+
+-- Sorts a list of angles
+angleSort :: Point -> [Point] -> [Point]
+angleSort p ps = sortBy (f p) ps
+  where
+    f p q r = case computeTurn p q r of
+      LeftTurn  -> LT
+      Straight  -> EQ
+      RightTurn -> GT
+
+
+grahamScan :: [Point] -> [Point]
+grahamScan [] = []
+grahamScan ps =
+  let sorted  = cartesianSort ps
+      p0      = head sorted
+      sorted' = angleSort p0 (tail sorted)
+  in p0:(computeHull sorted')
+
+
+-- Computes the list of turns necessary to traverse a list of ordered points in R^2
+computeHull :: [Point] -> [Point]
+computeHull (x:y:z:zs) =
+  case computeTurn x y z of
+    RightTurn ->   x:z:(computeHull zs)
+    otherwise -> x:y:z:(computeHull zs)
+computeHull _ = []
+
+
+-- grahamScan test:
+points = [  Point 2 1
+      , Point 5 2
+      , Point 4 3
+      , Point 5 4
+      , Point 3 5
+      , Point 3 4
+      , Point 2 3  ]
+
+main = print $ grahamScan points
